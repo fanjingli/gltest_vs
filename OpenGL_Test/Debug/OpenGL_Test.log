@@ -1,0 +1,5 @@
+﻿  main.cpp
+  GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+  GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+  OpenGL_Test.vcxproj -> C:\Users\fanjingli\Desktop\OpenGL_Test\Debug\OpenGL_Test.exe
+  OpenGL_Test.vcxproj -> C:\Users\fanjingli\Desktop\OpenGL_Test\Debug\OpenGL_Test.pdb (Full PDB)

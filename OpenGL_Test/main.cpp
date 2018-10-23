@@ -8,6 +8,8 @@
 #include "WindowsView.h"
 #include "stb_image.h"
 #include <glm\glm\glm.hpp>
+#include <glm\glm\gtc\matrix_transform.hpp>
+#include <glm\glm\gtc\type_ptr.hpp>
 
 using namespace std;
 
@@ -36,21 +38,15 @@ int main()
 	ShaderOperator shaderOperator;
 	shaderOperator.dealShader(vertexShaderSource, fragShaderSource);
 	
-	//float firstVertices[] = {
-	//	// 位置              // 颜色
-	//	0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
-	//	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
-	//	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
-	//};
 	float firstVertices[] = {
-		//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+		//     ---- 位置 ----       - 纹理坐标 -
+		0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // 右上
+		0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // 右下
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f,   // 左下
 
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+		0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // 右上
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   // 左下
+		-0.5f,  0.5f, 0.0f,   0.0f, 1.0f    // 左上
 	};
 
 
@@ -73,14 +69,11 @@ int main()
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(firstVertices), firstVertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 	
 	while (!glfwWindowShouldClose(windowsview.getWindowsPtr()))
 	{
@@ -94,9 +87,19 @@ int main()
 
 		glUseProgram(shaderOperator.getProgramID());
 
-		//unsigned int ourTexture = 0;
-		//int ourTexLoc = glGetUniformLocation(shaderOperator.getProgramID(), "ourTexture");
-		//glUniform1i(ourTexLoc, ourTexture);
+		glm::mat4 model;
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 view;
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -90.0f));
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(45.0f), 1.3f, 0.1f, 100.0f);
+
+		unsigned int modelMat = glGetUniformLocation(shaderOperator.getProgramID(), "model");
+		glUniformMatrix4fv(modelMat,1,GL_FALSE, glm::value_ptr(model));
+		unsigned int viewMat = glGetUniformLocation(shaderOperator.getProgramID(), "view");
+		glUniformMatrix4fv(viewMat, 1, GL_FALSE, &view[0][0]);
+		unsigned int projMat = glGetUniformLocation(shaderOperator.getProgramID(), "project");
+		glUniformMatrix4fv(projMat, 1, GL_FALSE, glm::value_ptr(projection));
 
 		//glBindVertexArray(VAO);
 		glBindTexture(GL_TEXTURE_2D, textureID);
